@@ -62,24 +62,39 @@
   </head>
   <body>
     <h1>Find Permutations</h1>
-    <input type="text" name="english" id="text" placeholder="Type here..." />
+    <input type="text" id="text" placeholder="Type here..." />
+    <input type="number" id="length" placeholder="Length (optional)" min="1" />
     <button py-click="solve">Find Permutations</button>
     <div id="answer"></div>
 
     <script type="py">
 from pyscript import display
 from pyscript import document, window
-try:
-    from itertools import permutations
-    def solve(event=None):
-        # Get input string
+from itertools import permutations
+
+def solve(event=None):
+    try:
+        # Get inputs
         string = document.querySelector("#text").value.strip()
+        length_input = document.querySelector("#length").value.strip()
         if not string:
             document.querySelector("#answer").innerHTML = "<p>Please enter a valid string.</p>"
             return
 
+        # Validate length input
+        if length_input:
+            try:
+                length = int(length_input)
+                if length < 1 or length > len(string):
+                    raise ValueError
+            except ValueError:
+                document.querySelector("#answer").innerHTML = "<p>Please enter a valid length (1-{}).</p>".format(len(string))
+                return
+        else:
+            length = len(string)
+
         # Generate permutations
-        perms = permutations(string)
+        perms = permutations(string, length)
         sorted_perms = sorted([''.join(p) for p in perms])
         total_perms = len(sorted_perms)
 
@@ -90,12 +105,12 @@ try:
         table_html += "</tbody></table>"
 
         # Display results
-        result_html = f"<h2>Permutations of \"{string}\"</h2>"
+        result_html = f"<h2>Permutations of \"{string}\" (Length: {length})</h2>"
         result_html += f"<p>Total number of permutations: {total_perms}</p>"
         result_html += table_html
         document.querySelector("#answer").innerHTML = result_html
-except Exception as err:
-    display(f"Error: {err}")
+    except Exception as err:
+        display(f"Error: {err}")
     </script>
   </body>
 </html>
