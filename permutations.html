@@ -68,9 +68,7 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #45a049;
-    }
+    
 
     /* Table styling */
     table {
@@ -98,6 +96,26 @@
 
     table tr:nth-child(odd) {
       background-color: #1a1a1a;
+    }
+
+    /* Toggle button styling */
+    .toggle-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ff6f61; /* Default red color */
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .toggle-btn.enabled {
+      background-color: #4caf50; /* Green color when enabled */
+    }
+
+    .toggle-btn:hover {
+      opacity: 0.8;
     }
 
     /* Floating button styles */
@@ -205,6 +223,7 @@
   <div class="input-section">
     <input type="text" id="inputText" placeholder="Enter a Word..." />
     <input type="number" id="permutationLength" placeholder="Length (optional)" min="1" />
+    <button id="toggleDuplicatesBtn" class="toggle-btn">Ignore Duplicate Characters: Off</button>
     <button id="generateBtn">Generate Permutations</button>
     <button id="clearBtn">Clear</button>
   </div>
@@ -244,12 +263,18 @@
 
     // Handle "Generate Permutations" button click
     document.getElementById('generateBtn').addEventListener('click', () => {
-      const string = document.getElementById('inputText').value.trim();
+      let string = document.getElementById('inputText').value.trim();
       const lengthInput = document.getElementById('permutationLength').value.trim();
+      const ignoreDuplicates = document.getElementById('toggleDuplicatesBtn').classList.contains('enabled');
 
       if (!string) {
         document.getElementById('outputSection').innerHTML = "<p>Please enter a valid word.</p>";
         return;
+      }
+
+      if (ignoreDuplicates) {
+        // Remove duplicate characters
+        string = [...new Set(string)].join('');
       }
 
       let length = string.length;
@@ -276,28 +301,34 @@
       `;
       const resultHtml = `
         <h2>Permutations of "${string}" (Length: ${length})</h2>
-        <p>Total number of permutations: ${perms.length}</p>
+        <p>Total: ${perms.length} permutations</p>
         ${tableHtml}
       `;
       document.getElementById('outputSection').innerHTML = resultHtml;
-      document.getElementById('outputSection').style.display = 'block'; // Show output section
+      document.getElementById('outputSection').style.display = 'block';
 
-      // Enable the copy and download buttons
+      // Enable floating buttons
       document.getElementById('copyBtn').disabled = false;
       document.getElementById('downloadBtn').disabled = false;
+    });
+
+    // Handle the toggle button click
+    document.getElementById('toggleDuplicatesBtn').addEventListener('click', () => {
+      const toggleBtn = document.getElementById('toggleDuplicatesBtn');
+      toggleBtn.classList.toggle('enabled');
+      toggleBtn.innerText = toggleBtn.classList.contains('enabled') ? 'Ignore Duplicate Characters: On' : 'Ignore Duplicate Characters: Off';
     });
 
     // Handle the copy button click
     document.getElementById('copyBtn').addEventListener('click', () => {
       const outputSection = document.getElementById('outputSection');
-
       if (outputSection.style.display !== 'none') {
         const permutationsText = document.querySelectorAll('#outputSection td:nth-child(2)');
         const permutations = Array.from(permutationsText).map(td => td.innerText).join(', ');
         navigator.clipboard.writeText(permutations)
           .then(() => alert('Permutations copied to clipboard!'))
           .catch(err => alert('Failed to copy text: ' + err));
-      } 
+      }
     });
 
     // Handle the download button click
