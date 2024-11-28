@@ -1,33 +1,101 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <title>Get Permutations</title>
-      <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
-      <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Get Permutations</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+    <style>
+      body {
+        background-color: #1e1e1e;
+        color: #cfcfcf;
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      input, button {
+        margin: 10px;
+        padding: 10px;
+        font-size: 16px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      table {
+        width: 100%;
+        max-width: 600px;
+        margin-top: 20px;
+        border-collapse: collapse;
+        text-align: center;
+      }
+      table th, table td {
+        border: 1px solid #555;
+        padding: 8px;
+      }
+      table th {
+        background-color: #333;
+      }
+      table tr:nth-child(even) {
+        background-color: #2a2a2a;
+      }
+      table tr:nth-child(odd) {
+        background-color: #1a1a1a;
+      }
+      #answer {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
-
+    <h1>Find Permutations</h1>
     <input type="text" name="english" id="text" placeholder="Type here..." />
     <button py-click="solve">Find Permutations</button>
     <div id="answer"></div>
+
     <script type="py">
 from pyscript import display
 from pyscript import document, window
 try:
     from itertools import permutations
-    def solve(event = None):
-        string = document.querySelector("#text").value
+    def solve(event=None):
+        # Get input string
+        string = document.querySelector("#text").value.strip()
+        if not string:
+            document.querySelector("#answer").innerHTML = "<p>Please enter a valid string.</p>"
+            return
+
+        # Generate permutations
         perms = permutations(string)
         sorted_perms = sorted([''.join(p) for p in perms])
-        document.querySelector("#answer").innerText = "Permutations of the string \"{}\":\n".format(string)
-        document.querySelector("#answer").innerText += f"Total number of permutations: {len(sorted_perms)}\n"
-        r = ", ".join(sorted_perms)
-        document.querySelector("#answer").innerText += ">> "+str(r)
+        total_perms = len(sorted_perms)
+
+        # Create table
+        table_html = "<table><thead><tr><th>#</th><th>Permutation</th></tr></thead><tbody>"
+        for idx, perm in enumerate(sorted_perms, 1):
+            table_html += f"<tr><td>{idx}</td><td>{perm}</td></tr>"
+        table_html += "</tbody></table>"
+
+        # Display results
+        result_html = f"<h2>Permutations of \"{string}\"</h2>"
+        result_html += f"<p>Total number of permutations: {total_perms}</p>"
+        result_html += table_html
+        document.querySelector("#answer").innerHTML = result_html
 except Exception as err:
     display(f"Error: {err}")
     </script>
-
   </body>
 </html>
