@@ -6,6 +6,7 @@
     <title>Get Permutations</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
       body {
         background-color: #1e1e1e;
@@ -58,6 +59,25 @@
         max-width: 600px;
         text-align: center;
       }
+
+      /* Floating download button styling */
+      #downloadBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      #downloadBtn:hover {
+        background-color: #0056b3;
+      }
     </style>
   </head>
   <body>
@@ -67,50 +87,66 @@
     <button py-click="solve">Find Permutations</button>
     <div id="answer"></div>
 
+    <!-- Floating download button (as an icon) -->
+    <button id="downloadBtn">&#128190;</button>
+
     <script type="py">
-from pyscript import display
-from pyscript import document, window
-from itertools import permutations
+      from pyscript import display
+      from pyscript import document, window
+      from itertools import permutations
 
-def solve(event=None):
-    try:
-        # Get inputs
-        string = document.querySelector("#text").value.strip()
-        length_input = document.querySelector("#length").value.strip()
-        if not string:
-            document.querySelector("#answer").innerHTML = "<p>Please enter a valid string.</p>"
-            return
+      def solve(event=None):
+          try:
+              # Get inputs
+              string = document.querySelector("#text").value.strip()
+              length_input = document.querySelector("#length").value.strip()
+              if not string:
+                  document.querySelector("#answer").innerHTML = "<p>Please enter a valid string.</p>"
+                  return
 
-        # Validate length input
-        if length_input:
-            try:
-                length = int(length_input)
-                if length < 1 or length > len(string):
-                    raise ValueError
-            except ValueError:
-                document.querySelector("#answer").innerHTML = "<p>Please enter a valid length (1-{}).</p>".format(len(string))
-                return
-        else:
-            length = len(string)
+              # Validate length input
+              if length_input:
+                  try:
+                      length = int(length_input)
+                      if length < 1 or length > len(string):
+                          raise ValueError
+                  except ValueError:
+                      document.querySelector("#answer").innerHTML = "<p>Please enter a valid length (1-{}).</p>".format(len(string))
+                      return
+              else:
+                  length = len(string)
 
-        # Generate permutations
-        perms = permutations(string, length)
-        sorted_perms = sorted([''.join(p) for p in perms])
-        total_perms = len(sorted_perms)
+              # Generate permutations
+              perms = permutations(string, length)
+              sorted_perms = sorted([''.join(p) for p in perms])
+              total_perms = len(sorted_perms)
 
-        # Create table
-        table_html = "<table><thead><tr><th>#</th><th>Permutation</th></tr></thead><tbody>"
-        for idx, perm in enumerate(sorted_perms, 1):
-            table_html += f"<tr><td>{idx}</td><td>{perm}</td></tr>"
-        table_html += "</tbody></table>"
+              # Create table
+              table_html = "<table><thead><tr><th>#</th><th>Permutation</th></tr></thead><tbody>"
+              for idx, perm in enumerate(sorted_perms, 1):
+                  table_html += f"<tr><td>{idx}</td><td>{perm}</td></tr>"
+              table_html += "</tbody></table>"
 
-        # Display results
-        result_html = f"<h2>Permutations of \"{string}\" (Length: {length})</h2>"
-        result_html += f"<p>Total number of permutations: {total_perms}</p>"
-        result_html += table_html
-        document.querySelector("#answer").innerHTML = result_html
-    except Exception as err:
-        display(f"Error: {err}")
+              # Display results
+              result_html = f"<h2>Permutations of \"{string}\" (Length: {length})</h2>"
+              result_html += f"<p>Total number of permutations: {total_perms}</p>"
+              result_html += table_html
+              document.querySelector("#answer").innerHTML = result_html
+          except Exception as err:
+              display(f"Error: {err}")
+    </script>
+
+    <script>
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        // Capture the entire page as an image
+        html2canvas(document.body).then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.href = imgData;
+          link.download = "permutations.png"; 
+          link.click(); 
+        });
+      });
     </script>
   </body>
 </html>
