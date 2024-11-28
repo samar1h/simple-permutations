@@ -1,155 +1,318 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Permutation Finder</title>
-    
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
-    <script src="html2canvas.min.js"></script>
-    <style>
-      body {
-        background-color: #1e1e1e;
-        color: #cfcfcf;
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permutation Finder</title>
+  <style>
+body {
+  background-color: #1e1e1e;
+  color: #cfcfcf;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #ffcc00;
+  text-align: center;
+}
+
+/* Input Section */
+.input-section {
+  margin-bottom: 20px;
+  background-color: #333;
+  padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.output-section {
+  display: none; /* Initially hidden */
+  margin-top: 20px;
+  width: 100%;
+  max-width: 800px; /* Allow output section to be wider on larger screens */
+  text-align: center;
+  background-color: #333;
+  padding: 15px;
+  border-radius: 8px;
+  box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+}
+
+/* Styling for input and button elements */
+input, button {
+  margin: 10px;
+  padding: 10px;
+  font-size: 16px;
+  width: 100%;
+  max-width: 350px; /* Allow inputs and buttons to stretch */
+  border-radius: 5px;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Table styling */
+/* Table styling */
+table {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto; /* This centers the table */
+  border-collapse: collapse;
+  text-align: center; /* Ensure that the table text is centered */
+  font-size: large;
+}
+
+table th, table td {
+  border: 1px solid #555;
+  padding: 8px;
+  text-align: center; /* Center content in cells */
+}
+
+table th {
+  background-color: #333;
+}
+
+table tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+
+table tr:nth-child(odd) {
+  background-color: #1a1a1a;
+}
+
+
+/* Floating button styles */
+.floating-btn {
+  position: fixed;
+  bottom: 20px;
+  padding: 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#downloadBtn {
+  right: 20px;
+}
+
+#copyBtn {
+  right: 90px; /* Positioned to the left of the download button */
+}
+
+.floating-btn:hover {
+  background-color: #0056b3;
+}
+
+#clearBtn {
+  background-color: #ff4d4d;
+}
+
+#clearBtn:hover {
+  background-color: #e60000;
+}
+
+/* Media Queries for responsiveness */
+@media (min-width: 768px) {
+  body {
+    padding: 40px;
+  }
+
+  .input-section, .output-section {
+    max-width: 80%; /* Stretch to 80% of available width */
+  }
+
+  h1 {
+    font-size: 36px; /* Larger font size for desktop */
+  }
+
+  input, button {
+    max-width: 400px; /* Wider inputs and buttons */
+  }
+
+  table {
+    font-size: larger; /* Make table font larger for better readability */
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding: 60px;
+  }
+
+  .input-section, .output-section {
+    max-width: 70%; /* Further stretch content for large screens */
+  }
+
+  h1 {
+    font-size: 40px; /* Even larger font size for large desktop screens */
+  }
+
+  input, button {
+    max-width: 500px; /* Even wider inputs and buttons */
+  }
+
+  table {
+    font-size: large; /* Ensure readability on large screens */
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <h1>Permutation Finder: Generate All Possible Permutations of a Word</h1>
+  
+  <!-- Input Section -->
+  <div class="input-section">
+    <input type="text" id="inputText" placeholder="Enter a word..." />
+    <input type="number" id="permutationLength" placeholder="Length of permutations (optional)" min="1" />
+    <button id="generateBtn">Generate Permutations</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+  
+  <!-- Output Section -->
+  <div class="output-section" id="outputSection"></div>
+
+  <!-- Floating buttons -->
+  <button id="copyBtn" class="floating-btn" title="Copy Permutations">&#x1f4cb;</button>
+  <button id="downloadBtn" class="floating-btn" title="Download as Image">&#128190;</button>
+
+  <script>
+    // Function to generate unique permutations of a specified length
+    function generatePermutations(str, length) {
+      const result = [];
+      const arr = str.split('');
+      const n = arr.length;
+
+      // Recursive function to generate the permutations
+      function permute(path, used) {
+        if (path.length === length) {
+          result.push(path.join(''));
+          return;
+        }
+
+        for (let i = 0; i < n; i++) {
+          if (used[i]) continue;  // Skip already used characters
+          used[i] = true;         // Mark the current character as used
+          permute(path.concat(arr[i]), used);
+          used[i] = false;        // Unmark the character as used for backtracking
+        }
       }
 
-      input, button {
-        margin: 10px;
-        padding: 10px;
-        font-size: 16px;
-      }
-      button {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #45a049;
-      }
-      table {
-        width: 100%;
-        max-width: 600px;
-        margin-top: 20px;
-        border-collapse: collapse;
-        text-align: center;
-        font-size: x-large;
-      }
-      table th, table td {
-        border: 1px solid #555;
-        padding: 8px;
-      }
-      table th {
-        background-color: #333;
-      }
-      table tr:nth-child(even) {
-        background-color: #2a2a2a;
-      }
-      table tr:nth-child(odd) {
-        background-color: #1a1a1a;
-      }
-      #answer {
-        margin-top: 20px;
-        width: 100%;
-        max-width: 600px;
-        text-align: center;
+      permute([], Array(n).fill(false)); // Start the permutation process
+      return result;
+    }
+
+    // Handle "Generate Permutations" button click
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const string = document.getElementById('inputText').value.trim();
+      const lengthInput = document.getElementById('permutationLength').value.trim();
+
+      if (!string) {
+        document.getElementById('outputSection').innerHTML = "<p>Please enter a valid word.</p>";
+        return;
       }
 
-      /* Floating download button styling */
-      #downloadBtn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
+      let length = string.length;
+      if (lengthInput) {
+        length = parseInt(lengthInput, 10);
+        if (length < 1 || length > string.length) {
+          document.getElementById('outputSection').innerHTML = `<p>Please enter a valid length (1-${string.length}).</p>`;
+          return;
+        }
       }
-      #downloadBtn:hover {
-        background-color: #0056b3;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Find Permutations</h1>
-    <input type="text" id="text" placeholder="Type here..." />
-    <input type="number" id="length" placeholder="Length (optional)" min="1" />
-    <button py-click="solve">Find Permutations</button>
-    <div id="answer"></div>
 
-    <!-- Floating download button (as an icon) -->
-    <button id="downloadBtn">&#128190;</button>
+      const perms = generatePermutations(string, length);
+      perms.sort();
 
-    <script type="py">
-      from pyscript import display
-      from pyscript import document, window
-      from itertools import permutations
+      const tableHtml = `
+        <table>
+          <thead>
+            <tr><th>#</th><th>Permutation</th></tr>
+          </thead>
+          <tbody>
+            ${perms.map((perm, idx) => `<tr><td>${idx + 1}</td><td>${perm}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      `;
+      const resultHtml = `
+        <h2>Permutations of "${string}" (Length: ${length})</h2>
+        <p>Total number of permutations: ${perms.length}</p>
+        ${tableHtml}
+      `;
+      document.getElementById('outputSection').innerHTML = resultHtml;
+      document.getElementById('outputSection').style.display = 'block'; // Show output section
+    });
 
-      def solve(event=None):
-          try:
-              # Get inputs
-              string = document.querySelector("#text").value.strip()
-              length_input = document.querySelector("#length").value.strip()
-              if not string:
-                  document.querySelector("#answer").innerHTML = "<p>Please enter a valid string.</p>"
-                  return
+    // Handle the copy button click
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const permutationsText = document.querySelectorAll('#outputSection td:nth-child(2)');
+      const permutations = Array.from(permutationsText).map(td => td.innerText).join(', ');
+      navigator.clipboard.writeText(permutations)
+        .then(() => alert('Permutations copied to clipboard!'))
+        .catch(err => alert('Failed to copy text: ' + err));
+    });
 
-              # Validate length input
-              if length_input:
-                  try:
-                      length = int(length_input)
-                      if length < 1 or length > len(string):
-                          raise ValueError
-                  except ValueError:
-                      document.querySelector("#answer").innerHTML = "<p>Please enter a valid length (1-{}).</p>".format(len(string))
-                      return
-              else:
-                  length = len(string)
+    // Handle the download button click
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      // Only download the output section
+      const outputSection = document.getElementById('outputSection');
 
-              # Generate permutations
-              perms = permutations(string, length)
-              sorted_perms = sorted([''.join(p) for p in perms])
-              total_perms = len(sorted_perms)
+      if (outputSection.style.display !== 'none') {
+        // Hide floating buttons before taking the screenshot
+        document.getElementById('copyBtn').style.display = 'none';
+        document.getElementById('downloadBtn').style.display = 'none';
 
-              # Create table
-              table_html = "<table><thead><tr><th>#</th><th>Permutation</th></tr></thead><tbody>"
-              for idx, perm in enumerate(sorted_perms, 1):
-                  table_html += f"<tr><td>{idx}</td><td>{perm}</td></tr>"
-              table_html += "</tbody></table>"
-
-              # Display results
-              result_html = f"<h2>Permutations of \"{string}\" (Length: {length})</h2>"
-              result_html += f"<p>Total number of permutations: {total_perms}</p>"
-              result_html += table_html
-              document.querySelector("#answer").innerHTML = result_html
-          except Exception as err:
-              display(f"Error: {err}")
-    </script>
-
-    <script>
-      document.getElementById("downloadBtn").addEventListener("click", () => {
-        // Capture the entire page as an image
-        html2canvas(document.body).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
-          const link = document.createElement("a");
+        // Capture the output section as an image
+        html2canvas(outputSection).then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
           link.href = imgData;
-          link.download = "permutations.png"; 
-          link.click(); 
+          link.download = 'permutations.png';
+          link.click();
+
+          // Show the buttons again after the download
+          document.getElementById('copyBtn').style.display = 'block';
+          document.getElementById('downloadBtn').style.display = 'block';
         });
-      });
-    </script>
-  </body>
+      }
+    });
+
+    // Handle the clear button click
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('inputText').value = '';
+      document.getElementById('permutationLength').value = '';
+      document.getElementById('outputSection').innerHTML = '';
+      document.getElementById('outputSection').style.display = 'none'; // Hide output section
+    });
+  </script>
+  <script src="html2canvas.min.js"></script>
+
+</body>
 </html>
