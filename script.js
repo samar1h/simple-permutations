@@ -12,15 +12,24 @@ function generatePermutations(str, length) {
       }
   
       for (let i = 0; i < n; i++) {
-        if (used[i]) continue;  // Skip already used characters
-        used[i] = true;         // Mark the current character as used
+        if (used[i]) continue; // Skip already used characters
+        used[i] = true; // Mark the current character as used
         permute(path.concat(arr[i]), used);
-        used[i] = false;        // Unmark the character as used for backtracking
+        used[i] = false; // Unmark the character as used for backtracking
       }
     }
   
     permute([], Array(n).fill(false)); // Start the permutation process
     return result;
+  }
+  
+  // Function to count occurrences of permutations
+  function countOccurrences(permutations) {
+    const occurrences = {};
+    permutations.forEach((perm) => {
+      occurrences[perm] = (occurrences[perm] || 0) + 1;
+    });
+    return occurrences;
   }
   
   // Handle "Generate Permutations" button click
@@ -58,6 +67,7 @@ function generatePermutations(str, length) {
     const perms = generatePermutations(input, length);
     perms.sort();
   
+    // Generate the permutations table
     const tableHtml = `
       <table>
         <thead>
@@ -68,10 +78,30 @@ function generatePermutations(str, length) {
         </tbody>
       </table>
     `;
+  
+    // Count occurrences of permutations
+    const occurrences = countOccurrences(perms);
+  
+    // Generate the occurrences table
+    const occurrencesTableHtml = `
+      <table>
+        <thead>
+          <tr><th>Permutation</th><th>Occurrences</th></tr>
+        </thead>
+        <tbody>
+          ${Object.entries(occurrences)
+            .map(([perm, count]) => `<tr><td>${perm}</td><td>${count}</td></tr>`)
+            .join('')}
+        </tbody>
+      </table>
+    `;
+  
     const resultHtml = `
       <h2>Permutations of "${input}" (Length: ${length})</h2>
       <p>Total: ${perms.length} permutations</p>
       ${tableHtml}
+      <h2>Occurrences of Permutations</h2>
+      ${occurrencesTableHtml}
     `;
     document.getElementById('outputSection').innerHTML = resultHtml;
     document.getElementById('outputSection').style.display = 'block';
@@ -85,14 +115,18 @@ function generatePermutations(str, length) {
   document.getElementById('toggleDuplicatesBtn').addEventListener('click', () => {
     const toggleBtn = document.getElementById('toggleDuplicatesBtn');
     toggleBtn.classList.toggle('enabled');
-    toggleBtn.innerText = toggleBtn.classList.contains('enabled') ? 'Ignore Duplicate Characters: On' : 'Ignore Duplicate Characters: Off';
+    toggleBtn.innerText = toggleBtn.classList.contains('enabled')
+      ? 'Ignore Duplicate Characters: On'
+      : 'Ignore Duplicate Characters: Off';
   });
   
   // Handle the toggle button for removing duplicate words
   document.getElementById('toggleDuplicateWordsBtn').addEventListener('click', () => {
     const toggleBtn = document.getElementById('toggleDuplicateWordsBtn');
     toggleBtn.classList.toggle('enabled');
-    toggleBtn.innerText = toggleBtn.classList.contains('enabled') ? 'Ignore Duplicate Words: On' : 'Ignore Duplicate Words: Off';
+    toggleBtn.innerText = toggleBtn.classList.contains('enabled')
+      ? 'Remove Duplicate Words: On'
+      : 'Remove Duplicate Words: Off';
   });
   
   // Handle the copy button click
@@ -100,10 +134,13 @@ function generatePermutations(str, length) {
     const outputSection = document.getElementById('outputSection');
     if (outputSection.style.display !== 'none') {
       const permutationsText = document.querySelectorAll('#outputSection td:nth-child(2)');
-      const permutations = Array.from(permutationsText).map(td => td.innerText).join(', ');
-      navigator.clipboard.writeText(permutations)
+      const permutations = Array.from(permutationsText)
+        .map((td) => td.innerText)
+        .join(', ');
+      navigator.clipboard
+        .writeText(permutations)
         .then(() => alert('Permutations copied to clipboard!'))
-        .catch(err => alert('Failed to copy text: ' + err));
+        .catch((err) => alert('Failed to copy text: ' + err));
     }
   });
   
