@@ -102,6 +102,7 @@ document.getElementById('generateBtn').addEventListener('click', () => {
         <a href="#occurrencesTable" class="nav-link">&#128279; Occurrences Table</a>
         ${tableHtml}
         <h2 id="occurrencesTable">Occurrences of Permutations</h2>
+        <p>Total Unique Permutations: ${Object.keys(occurrences).length}</p>
         <a href="#permutationsTable" class="nav-link">&#128279; Permutations Table</a>
         ${occurrencesTableHtml}
     `;
