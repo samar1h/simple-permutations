@@ -173,9 +173,15 @@ function generatePermutations(str, length) {
     document.getElementById('permutationLength').value = '';
     document.getElementById('outputSection').innerHTML = '';
     document.getElementById('outputSection').style.display = 'none'; // Hide output section
+    document.getElementById('lengthInfo').innerText = `Current Length: 0`;
   
     // Disable the copy and download buttons
     document.getElementById('copyBtn').disabled = true;
     document.getElementById('downloadBtn').disabled = true;
+  });
+
+  document.getElementById('inputText').addEventListener('input', function() {
+    const inputLength = this.value.trim().length;
+    document.getElementById('lengthInfo').innerText = `Current Length: ${inputLength}`;
   });
   
