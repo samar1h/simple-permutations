@@ -180,8 +180,8 @@ function generatePermutations(str, length) {
     document.getElementById('downloadBtn').disabled = true;
   });
 
-  document.getElementById('inputText').addEventListener('input', function() {
-    const inputLength = this.value.trim().length;
-    document.getElementById('lengthInfo').innerText = `Current Length: ${inputLength}`;
-  });
+  $('#inputText').on('input', function() {
+    const inputLength = $(this).val().length;
+    $('#lengthInfo').text(`Current Length: ${inputLength}`);
+});
   
